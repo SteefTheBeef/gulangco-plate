@@ -1,4 +1,4 @@
-app.controller 'mainCtrl', ($scope) ->
+angular.module('plate').controller 'mainCtrl', ($scope) ->
   $scope.data = {
     name: 'Gulangco Plate '
   }

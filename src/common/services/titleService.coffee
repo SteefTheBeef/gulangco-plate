@@ -1,4 +1,4 @@
-app.factory 'titleService', ($document) ->
+angular.module('plate').factory 'titleService', ($document) ->
   prefix = ''
 
   return {
