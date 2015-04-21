@@ -8,16 +8,17 @@ general =
   less: (sourceFiles, dest) -> require('./gulp/tasks/less.coffee')(sourceFiles, dest)
   webserver: (serverRoot) -> require('./gulp/tasks/webserver.coffee')(serverRoot)
   templateCache: (sourceFiles, dest) -> require('./gulp/tasks/templateCache.coffee')(sourceFiles, dest)
+  copy: (sourceFiles, dest, options) ->require('./gulp/tasks/copy.coffee')(sourceFiles, dest, options)
 
 build =
-  copyVendor: () -> require('./gulp/tasks/copyVendor.coffee')(paths.vendor, paths.build.directories.base)
+  copyVendor: () -> require('./gulp/tasks/copy.coffee')(paths.vendor, paths.build.directories.base)
   coffee: () -> require('./gulp/tasks/coffee.coffee')(paths.coffee.files, paths.build.directories.base)
-  copyHtml: () -> require('./gulp/tasks/copyHtml.coffee')(paths.html.files, paths.build.directories.base)
-  inject: () -> require('./gulp/tasks/injectBuild.coffee')(paths.index, paths.inject.coffeeToJs(), paths.vendor, paths.inject.lessToCss(), paths.build.directories.base)
+  copyHtml: () -> require('./gulp/tasks/copy.coffee')(paths.html.files, paths.build.directories.base)
+  inject: () -> require('./gulp/tasks/injectBuild.coffee')(paths.index, paths.inject.coffeeToJs(), paths.vendor.js, paths.inject.lessToCss(), paths.build.directories.base)
   webserver: () -> require('./gulp/tasks/webserver.coffee')(paths.build.directories.base)
 
 compile =
-  minifyJS: () -> require('./gulp/tasks/minifyJS.coffee')(paths.vendor, 'vendor.js', paths.dist.directories.tmp)
+  minifyJS: () -> require('./gulp/tasks/minifyJS.coffee')(paths.vendor.js, 'vendor.js', paths.dist.directories.tmp)
   minifyCoffeeToJs: () -> require('./gulp/tasks/minifyCoffeeToJs.coffee')(paths.coffee.files, 'scripts.js', paths.dist.directories.tmp)
   inject: () -> require('./gulp/tasks/injectDist.coffee')(paths.index, 'dist/js/production.js', 'dist/css/production.css', paths.dist.directories.base)
 
@@ -26,13 +27,14 @@ gulp.task 'test', () -> general.test()
 
 # Build tasks
 gulp.task 'b-clean', (callback) -> general.clean(paths.build.directories.base, callback)
-gulp.task 'b-copyVendor', ['b-clean'], () -> build.copyVendor()
+gulp.task 'b-copyVendor', ['b-clean'], () -> general.copy(paths.vendor.js, paths.build.directories.base)
 gulp.task 'b-coffee', ['b-clean'], () -> build.coffee()
 gulp.task 'b-less', ['b-clean'], () -> general.less(paths.less.build,  paths.build.directories.css)
-gulp.task 'b-copyHtml', ['b-clean'], () -> build.copyHtml()
+gulp.task 'b-copyFonts', ['b-clean'], () -> general.copy(paths.vendor.fonts, paths.build.directories.fonts, {})
+gulp.task 'b-copyHtml', ['b-clean'], () -> general.copy(paths.html.files, paths.build.directories.base)
 gulp.task 'b-inject', ['b-clean', 'b-copyVendor', 'b-coffee'], () -> build.inject()
-gulp.task 'b-webserver', ['b-clean', 'b-copyHtml', 'b-copyVendor', 'b-coffee', 'b-less', 'b-inject'], () -> general.webserver(paths.build.directories.base)
-gulp.task 'build', ['b-clean', 'b-copyVendor', 'b-coffee', 'b-inject','b-less', 'b-webserver'], () ->
+gulp.task 'b-webserver', ['b-clean', 'b-copyFonts', 'b-copyHtml', 'b-copyVendor', 'b-coffee', 'b-less', 'b-inject'], () -> general.webserver(paths.build.directories.base)
+gulp.task 'build', ['b-clean', 'b-copyFonts', 'b-copyHtml', 'b-copyVendor', 'b-coffee', 'b-less', 'b-inject', 'b-webserver'], () ->
   require('./gulp/tasks/buildWatch.coffee')(paths.coffee, paths.build.directories.js)
 
 # compile tasks

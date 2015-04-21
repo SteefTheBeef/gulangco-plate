@@ -1,6 +1,7 @@
 gulp = require 'gulp'
+plumber = require 'gulp-plumber'
 streamify = require('gulp-streamify')
-minifyCSS =
+minifyCSS = 'gulp-minify-css'
 less = require 'gulp-less'
 
 module.exports = (sourceFiles, destination, minify = false) ->
@@ -11,7 +12,11 @@ module.exports = (sourceFiles, destination, minify = false) ->
     .pipe(gulp.dest(destination))
   else
     stream = gulp.src(sourceFiles)
-    .pipe(streamify(less()))
+    .pipe(plumber (err) ->
+      console.log "\nLESS ERROR\n" + err.message + "\n"
+      @emit('end')
+    )
+    .pipe(less())
     .pipe(gulp.dest(destination))
   stream
 

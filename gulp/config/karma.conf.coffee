@@ -1,5 +1,4 @@
 module.exports = (config) ->
-  console.log config
   config.set
     preprocessors: {
       '../../src/**/*.coffee': ['coffee']
@@ -12,12 +11,6 @@ module.exports = (config) ->
       transformPath: (path) ->
         path.replace(/\.coffee$/, '.js')
     }
-    browserify: {
-      transform: ['coffeeify']
-
-      # don't forget to register the extensions
-      extensions: ['.js', '.jsx', '.coffee']
-    }
     basePath: ''
     files: [
       '../../bower_components/angular/angular.js'
@@ -26,7 +19,7 @@ module.exports = (config) ->
       '../../src/**/*.coffee'
       '../../src/**/*.spec.coffee'
     ],
-    frameworks: ['jasmine', 'browserify']
+    frameworks: ['jasmine']
     browsers: ['PhantomJS']
     port: 9876,
     captureTimeout: 20000,
