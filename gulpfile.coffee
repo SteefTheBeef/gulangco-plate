@@ -4,7 +4,8 @@ paths = require './gulp/config/paths.coffee'
 general =
   clean: (directory, callback) -> require('./gulp/tasks/clean.coffee')(directory, callback)
   concat: (sourceFiles, filename, dest) -> require('./gulp/tasks/concat.coffee')(sourceFiles, filename, dest)
-  test: () -> require('./gulp/tasks/test.coffee')(paths.vendor)
+  testRun: () -> require('./gulp/tasks/test.coffee')()
+  testWatch: () -> require('./gulp/tasks/test.coffee')('watch')
   less: (sourceFiles, dest) -> require('./gulp/tasks/less.coffee')(sourceFiles, dest)
   webserver: (serverRoot) -> require('./gulp/tasks/webserver.coffee')(serverRoot)
   templateCache: (sourceFiles, dest) -> require('./gulp/tasks/templateCache.coffee')(sourceFiles, dest)
@@ -23,7 +24,10 @@ compile =
   inject: () -> require('./gulp/tasks/injectDist.coffee')(paths.index, 'dist/js/production.js', 'dist/css/production.css', paths.dist.directories.base)
 
 # Test tasks
-gulp.task 'test', () -> general.test()
+gulp.task 'test', -> general.testRun()
+gulp.task 'testw', -> general.testWatch()
+gulp.task 'testwatch', ['testw'], ->
+  gulp.watch(paths.coffee.base + '/**/*', ['testw'])
 
 # Build tasks
 gulp.task 'b-clean', (callback) -> general.clean(paths.build.directories.base, callback)
@@ -32,9 +36,10 @@ gulp.task 'b-coffee', ['b-clean'], () -> build.coffee()
 gulp.task 'b-less', ['b-clean'], () -> general.less(paths.less.build,  paths.build.directories.css)
 gulp.task 'b-copyFonts', ['b-clean'], () -> general.copy(paths.vendor.fonts, paths.build.directories.fonts, {})
 gulp.task 'b-copyHtml', ['b-clean'], () -> general.copy(paths.html.files, paths.build.directories.base)
+gulp.task 'b-templateCache', ['b-clean'], () -> general.templateCache(paths.html.tpl, paths.build.directories.js)
 gulp.task 'b-inject', ['b-clean', 'b-copyVendor', 'b-coffee'], () -> build.inject()
-gulp.task 'b-webserver', ['b-clean', 'b-copyFonts', 'b-copyHtml', 'b-copyVendor', 'b-coffee', 'b-less', 'b-inject'], () -> general.webserver(paths.build.directories.base)
-gulp.task 'build', ['b-clean', 'b-copyFonts', 'b-copyHtml', 'b-copyVendor', 'b-coffee', 'b-less', 'b-inject', 'b-webserver'], () ->
+gulp.task 'b-webserver', ['b-clean', 'b-copyFonts', 'b-templateCache', 'b-copyVendor', 'b-coffee', 'b-less', 'b-inject'], () -> general.webserver(paths.build.directories.base)
+gulp.task 'build', ['b-clean', 'b-copyFonts', 'b-templateCache', 'b-copyVendor', 'b-coffee', 'b-less', 'b-inject', 'b-webserver'], () ->
   require('./gulp/tasks/buildWatch.coffee')(paths.coffee, paths.build.directories.js)
 
 # compile tasks
@@ -49,5 +54,3 @@ gulp.task 'c-inject', ['c-clean', 'c-templateCache', 'c-minifyCoffeeToJS','c-min
 gulp.task 'c-webserver', ['c-clean', 'c-templateCache', 'c-minifyCoffeeToJS','c-minifyVendorJS', 'c-concat', 'c-less', 'c-inject'], () -> general.webserver(paths.dist.directories.base)
 
 gulp.task 'compile', ['c-clean', 'c-templateCache', 'c-minifyCoffeeToJS','c-minifyVendorJS', 'c-concat', 'c-less', 'c-inject', 'c-webserver'], () ->
-
-

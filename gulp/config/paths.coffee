@@ -4,7 +4,8 @@ obj =
   build:
     directories:
       base: 'build/'
-      js: 'build/app/'
+      tmp: 'build/.tmp/'
+      js: 'build/src/'
       vendor: 'build/vendor/'
       css: 'build/assets/css/'
       fonts: 'build/assets/fonts/'
@@ -28,7 +29,6 @@ obj =
     ]
     fonts: [
       'bower_components/ionicons/fonts/*'
-      'bower_components/mdi/fonts/*'
     ]
   coffee:
     base: 'src/'

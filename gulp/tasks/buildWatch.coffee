@@ -4,7 +4,7 @@ paths = require '../config/paths.coffee'
 module.exports = () ->
   console.log 'Watching for .coffee, .less and .html file changes.'
 
-  gulp.task 'b-watchHtml', -> require('./copy.coffee')(paths.html.files, paths.build.directories.base)
+  gulp.task 'b-watchHtml', -> require('./templateCache.coffee')(paths.html.tpl, paths.build.directories.js)
   gulp.watch(paths.html.watch + '/**/*', ['b-watchHtml'])
 
   gulp.task 'index', ['coffee', 'less'] ,-> require('./injectBuild.coffee')(paths.index, paths.inject.coffeeToJs(), paths.vendor.js, paths.inject.lessToCss(), paths.build.directories.base)

@@ -1,9 +1,9 @@
-angular.module('plate').factory 'titleService', ($document) ->
+angular.module('titleService', []).factory 'titleService', ($document) ->
   prefix = ''
 
   return {
     setPrefix: (p) -> prefix = p
-    getPrefix: () -> prefix
+    getPrefix: -> prefix
 
     setTitle: ( t ) ->
       if prefix isnt ''
@@ -14,6 +14,6 @@ angular.module('plate').factory 'titleService', ($document) ->
       $document.prop 'title', title
       @title = t
 
-    getTitle: () -> $document.prop 'title'
+    getTitle: -> $document.prop 'title'
   }
 

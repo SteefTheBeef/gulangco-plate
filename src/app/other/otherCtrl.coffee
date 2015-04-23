@@ -1,1 +1,1 @@
-angular.module('plate').controller 'otherCtrl', ($scope) ->
+angular.module('otherCtrl', []).controller 'otherCtrl', ($scope) ->
